@@ -48,6 +48,9 @@ MESSAGES_ja["INSTALL_GEMINI_CLI"]="Gemini連携のために gemini-cli.nvim を�
 MESSAGES_ja["ADDED_GEMINI_CLI"]="init.luaに gemini-cli.nvim を追加しました。"
 MESSAGES_ja["INSTALL_CODE_COMPANION"]="AI支援のコード補完と生成のために CodeCompanion.nvim をインストールしますか？ [y/N]: "
 MESSAGES_ja["ADDED_CODE_COMPANION"]="init.luaに CodeCompanion.nvim を追加しました。"
+MESSAGES_ja["CHOOSE_LLM_MODEL"]="CodeCompanion.nvimで使用するLLMモデルを選択してください:"
+MESSAGES_ja["LLM_MODEL_OPTIONS"]="1) Gemini 3 Pro\n2) Gemini 3 Flash\n3) Gemini 2.5 Pro\n4) Gemini 2.5 Flash\n5) GPT-5\n6) GPT-4.5\n7) Claude 3.5 Sonnet\n8) Claude Opus"
+MESSAGES_ja["ENTER_API_KEY"]="APIキーを入力してください: "
 MESSAGES_ja["ADDED_DEV_PLUGIN_CONFIGS"]="init.luaに開発プラグイン設定を追加しました。"
 MESSAGES_ja["SETUP_COMPLETE"]="✓ セットアップが完了しました！"
 MESSAGES_ja["RUN_NVIM_TO_INSTALL"]="'nvim' を実行して設定されたプラグインをインストールしてください。"
@@ -95,6 +98,9 @@ MESSAGES_en["INSTALL_GEMINI_CLI"]="Install gemini-cli.nvim for Gemini integratio
 MESSAGES_en["ADDED_GEMINI_CLI"]="Added gemini-cli.nvim to init.lua."
 MESSAGES_en["INSTALL_CODE_COMPANION"]="Install CodeCompanion.nvim for AI-assisted code completion and generation? [y/N]: "
 MESSAGES_en["ADDED_CODE_COMPANION"]="Added CodeCompanion.nvim to init.lua."
+MESSAGES_en["CHOOSE_LLM_MODEL"]="Choose the LLM model for CodeCompanion.nvim:"
+MESSAGES_en["LLM_MODEL_OPTIONS"]="1) Gemini 3 Pro\n2) Gemini 3 Flash\n3) Gemini 2.5 Pro\n4) Gemini 2.5 Flash\n5) GPT-5\n6) GPT-4.5\n7) Claude 3.5 Sonnet\n8) Claude Opus"
+MESSAGES_en["ENTER_API_KEY"]="Please enter your API key: "
 MESSAGES_en["ADDED_DEV_PLUGIN_CONFIGS"]="Added development plugin configurations to init.lua."
 MESSAGES_en["SETUP_COMPLETE"]="✓ Setup complete!"
 MESSAGES_en["RUN_NVIM_TO_INSTALL"]="Run 'nvim' to start NeoVim and install the configured plugins."
@@ -109,7 +115,7 @@ _msg() {
     elif [[ -v "MESSAGES_en[$key]" ]]; then
         printf "${MESSAGES_en[$key]}" "${@:2}"
     else
-        printf "$key" "${@:2}"
+        echo "$key" "${@:2}"
     fi
 }
 
@@ -127,10 +133,10 @@ echo
 
 echo "$(_msg \"PART1_HEADER\")"
 if ! command -v nvim &> /dev/null; then
-    echo "$(_msg \"NEOVIM_NOT_FOUND\")"
-    for cmd in curl chmod sudo tar uname; do
+    echo "$(_msg "NEOVIM_NOT_FOUND")"
+    for cmd in curl chmod sudo tar uname file rg; do
         if ! command -v $cmd &> /dev/null; then
-            echo "$(_msg \"ERROR_REQUIRED_COMMAND_NOT_FOUND\" \"$cmd\")"
+            echo "$(_msg "ERROR_REQUIRED_COMMAND_NOT_FOUND" "$cmd")"
             exit 1
         fi
     done
@@ -140,18 +146,18 @@ if ! command -v nvim &> /dev/null; then
     mkdir -p "$NVIM_INSTALL_DIR"
     echo "$(_msg \"INSTALLATION_DIRECTORY\" \"$NVIM_INSTALL_DIR\")"
     if [ "$ARCH" = "x86_64" ]; then
-        echo "$(_msg \"DOWNLOADING_APPIMAGE_X86\")"
-        curl -Lo "$NVIM_INSTALL_DIR/nvim.appimage" https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.appimage
-        echo "$(_msg \"GRANTING_EXEC_PERMISSION\")"
+        echo "$(_msg "DOWNLOADING_APPIMAGE_X86")"
+        curl -Lo "$NVIM_INSTALL_DIR/nvim.appimage" https://github.com/neovim/neovim/releases/download/v0.11.0/nvim-linux-x86_64.appimage
+        echo "$(_msg "GRANTING_EXEC_PERMISSION")"
         chmod +x "$NVIM_INSTALL_DIR/nvim.appimage"
-        echo "$(_msg \"EXTRACTING_APPIMAGE\")"
+        echo "$(_msg "EXTRACTING_APPIMAGE")"
         rm -rf "$NVIM_INSTALL_DIR/squashfs-root"
         (cd "$NVIM_INSTALL_DIR" && ./nvim.appimage --appimage-extract)
         NVIM_EXECUTABLE_PATH="$NVIM_INSTALL_DIR/squashfs-root/usr/bin/nvim"
     elif [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
-        echo "$(_msg \"DOWNLOADING_TAR_ARM\")"
-        curl -Lo "$NVIM_INSTALL_DIR/nvim-linux-arm64.tar.gz" https://github.com/neovim/neovim/releases/download/stable/nvim-linux-arm64.tar.gz
-        echo "$(_msg \"EXTRACTING_TAR\")"
+        echo "$(_msg "DOWNLOADING_TAR_ARM")"
+        curl -Lo "$NVIM_INSTALL_DIR/nvim-linux-arm64.tar.gz" https://github.com/neovim/neovim/releases/download/v0.11.0/nvim-linux-arm64.tar.gz
+        echo "$(_msg "EXTRACTING_TAR")"
         rm -rf "$NVIM_INSTALL_DIR/nvim-linux-arm64"
         tar -xzf "$NVIM_INSTALL_DIR/nvim-linux-arm64.tar.gz" -C "$NVIM_INSTALL_DIR"
         NVIM_EXECUTABLE_PATH="$NVIM_INSTALL_DIR/nvim-linux-arm64/bin/nvim"
@@ -203,6 +209,8 @@ clone_plugin() {
 }
 clone_plugin "https://github.com/gera2ld/ai.nvim.git" "$HOME/.local/share/nvim/site/pack/dist/start/ai.nvim"
 clone_plugin "https://github.com/nvim-lua/plenary.nvim.git" "$HOME/.local/share/nvim/site/pack/dist/start/plenary.nvim"
+clone_plugin "https://github.com/olimorris/codecompanion.nvim.git" "$HOME/.local/share/nvim/site/pack/dist/start/codecompanion.nvim"
+clone_plugin "https://github.com/nvim-treesitter/nvim-treesitter.git" "$HOME/.local/share/nvim/site/pack/dist/start/nvim-treesitter"
 NVIM_CONFIG_DIR="$HOME/.config/nvim"
 INIT_LUA_PATH="$NVIM_CONFIG_DIR/init.lua"
 echo "$(_msg \"STARTING_CONFIGURATION\")"
@@ -230,7 +238,6 @@ if [[ "$install_essential" =~ ^[yY](es)?$ ]]; then
   cat << 'EOF' >> "$INIT_LUA_PATH"
     -- Essential & popular plugins
     { 'nvim-telescope/telescope.nvim', tag = '0.1.x', dependencies = { 'nvim-lua/plenary.nvim' } },
-    { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' },
     { 'lewis6991/gitsigns.nvim' },
 EOF
   echo "$(_msg \"ADDED_ESSENTIAL_PLUGINS\")"
@@ -255,16 +262,43 @@ if [[ "$install_gemini_cli" =~ ^[yY](es)?$ ]]; then
 EOF
   echo "$(_msg \"ADDED_GEMINI_CLI\")"
 fi
-read -p "$(_msg \"INSTALL_CODE_COMPANION\")" -r install_code_companion
-if [[ "$install_code_companion" =~ ^[yY](es)?$ ]]; then
-  cat << 'EOF' >> "$INIT_LUA_PATH"
-    -- CodeCompanion.nvim plugin
-    { 'dnlr-dev/CodeCompanion.nvim' },
-EOF
-  echo "$(_msg \"ADDED_CODE_COMPANION\")"
-fi
 echo "  }," >> "$INIT_LUA_PATH"
 echo "})" >> "$INIT_LUA_PATH"
+read -p "$(_msg \"INSTALL_CODE_COMPANION\")" -r install_code_companion
+if [[ "$install_code_companion" =~ ^[yY](es)?$ ]]; then
+  echo "$(_msg "CHOOSE_LLM_MODEL")"
+  echo -e "$(_msg "LLM_MODEL_OPTIONS")"
+  read -p "$(_msg "ENTER_CHOICE")" llm_choice
+  case "$llm_choice" in
+    1) ADAPTER_NAME="gemini"; LLM_MODEL="gemini-3-pro" ;;
+    2) ADAPTER_NAME="gemini"; LLM_MODEL="gemini-3-flash" ;;
+    3) ADAPTER_NAME="gemini"; LLM_MODEL="gemini-2.5-pro" ;;
+    4) ADAPTER_NAME="gemini"; LLM_MODEL="gemini-2.5-flash" ;;
+    5) ADAPTER_NAME="openai"; LLM_MODEL="gpt-5" ;;
+    6) ADAPTER_NAME="openai"; LLM_MODEL="gpt-4.5" ;;
+    7) ADAPTER_NAME="anthropic"; LLM_MODEL="claude-3.5-sonnet" ;;
+    8) ADAPTER_NAME="anthropic"; LLM_MODEL="claude-opus" ;;
+    *) ADAPTER_NAME="gemini"; LLM_MODEL="gemini-3-pro" ;;
+  esac
+  read -sp "$(_msg 'ENTER_API_KEY')" API_KEY
+  echo
+  cat << EOF >> "$INIT_LUA_PATH"
+
+-- Setup CodeCompanion separately
+require('codecompanion').setup({
+  adapters = {
+    ["$ADAPTER_NAME"] = {
+      model = "'$LLM_MODEL'",
+      api_key = "'$API_KEY'",
+    }
+  },
+  tools = {
+    -- your tools options
+  }
+})
+EOF
+  echo "$(_msg "ADDED_CODE_COMPANION")"
+fi
 if [[ "$install_specific" =~ ^[yY](es)?$ ]]; then
   cat << 'EOF' >> "$INIT_LUA_PATH"
 

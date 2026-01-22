@@ -1,4 +1,4 @@
-# neovim-setup
+# neovim-setup v.0.1.0
 NeoVimのインストールと設定をするためのShell Scriptです。
 ### 必ずインストールされるプラグイン:
    * gera2ld/ai.nvim (プラグインマネージャー)
@@ -15,7 +15,11 @@ NeoVimのインストールと設定をするためのShell Scriptです。
        * williamboman/mason.nvim (LSPサーバーなどのパッケージマネージャー)
        * williamboman/mason-lspconfig.nvim (MasonとLSPconfigの連携)
        * mfussenegger/nvim-dap (デバッガー)
-##### `gemini-cli.nvim`の選択時:
+#### `gemini-cli.nvim`の選択時:
        * gera2ld/gemini-cli.nvim (Gemini連携)
-##### `CodeCompanion.nvim`の選択時:
-       * dnlr-dev/CodeCompanion.nvim (AI支援コード補完・生成)
+#### `CodeCompanion.nvim`の選択時:
+       * olimorris/CodeCompanion.nvim (AI支援コード補完・生成)
+### 使用方法
+1. `git clone https://github.com/kamome-run/neovim-setup.git`
+2. `cd neovim-setup/`
+3. `./setup.sh`
